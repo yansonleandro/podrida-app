@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#00ADB5"/>
+    <link rel="manifest" href="manifest.json">
+
+    <title>La Podrida - Puntuación</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>La Podrida - Puntuación</h1>
+        
+        <!-- Pestañas -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="player-registration">Jugadores</button>
+            <button class="tab-btn" data-tab="round-configuration">Rondas</button>
+            <button class="tab-btn" data-tab="game-board">Juego</button>
+            <button class="tab-btn" data-tab="game-end">Fin del Juego</button>
+        </div>
+
+        <main>
+            <!-- Registro de Jugadores -->
+            <section id="player-registration" class="tab-content active">
+                <h2>Registro de Jugadores</h2>
+                <p class="description">Ingresa los nombres de los jugadores en el orden en que van a jugar.</p>
+                
+                <div id="players-container">
+                    <div class="player-input">
+                        <input type="text" placeholder="Jugador 1" class="player-name">
+                        <button class="remove-player" title="Eliminar jugador">✕</button>
+                    </div>
+                    <div class="player-input">
+                        <input type="text" placeholder="Jugador 2" class="player-name">
+                        <button class="remove-player" title="Eliminar jugador">✕</button>
+                    </div>
+                </div>
+                
+                <button id="add-player" class="secondary-button">+ Agregar Jugador</button>
+                
+                <div id="player-error" class="error-message"></div>
+                
+                <button id="players-submit" class="primary-button">Continuar</button>
+            </section>
+
+            <!-- Configuración de Rondas -->
+            <section id="round-configuration" class="tab-content hidden">
+                <h2>Configuración de Rondas</h2>
+                <p class="description">Indica cuántas rondas completas se jugarán. Cada ronda consiste en 4 manos (1, 3, 5 y 7 cartas).</p>
+                
+                <div class="form-group">
+                    <label for="rounds">Número de Rondas</label>
+                    <input type="number" id="rounds" min="1" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="first-dealer">¿Quién reparte primero?</label>
+                    <select id="first-dealer">
+                        <!-- Options will be dynamically updated via JavaScript -->
+                    </select>
+                </div>
+                
+                <div id="round-summary" class="summary-box">
+                    <h3>Resumen:</h3>
+                    <ul>
+                        <li>Cada jugador repartirá <span id="rounds-per-player">1</span> veces</li>
+                        <li>Se jugarán un total de <span id="total-hands">4</span> manos por cada vez que un jugador reparta</li>
+                        <li>La duración estimada es de <span id="estimated-time">20</span> minutos</li>
+                    </ul>
+                </div>
+                
+                <div id="round-error" class="error-message"></div>
+                
+                <button id="rounds-submit" class="primary-button">Comenzar Juego</button>
+            </section>
+
+            <!-- Tablero de Juego -->
+            <section id="game-board" class="tab-content hidden">
+                <div class="game-info card">
+                    <div class="info-grid">
+                        <div>
+                            <span class="label">Ronda:</span> <span id="current-round">1</span> de <span id="total-rounds">1</span>
+                        </div>
+                        <div>
+                            <span class="label">Mano:</span> <span id="current-hand-cards">1</span> cartas
+                        </div>
+                        <div>
+                            <span class="label">Repartidor:</span> <span id="current-dealer">-</span>
+                        </div>
+                        <div>
+                            <span class="label">Fase:</span> <span id="current-phase">Predicciones</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Predicciones -->
+                <div id="predictions-section" class="card">
+                    <h2>Predicciones - <span id="prediction-cards">1</span> Carta(s)</h2>
+                    
+                    <div id="current-player-info" class="info-box">
+                        <p>Turno de <span id="current-player-name">-</span> para predecir</p>
+                        <p class="small">Predicciones hechas: <span id="predictions-made">0</span> de <span id="total-players">3</span></p>
+                    </div>
+                    
+                    <div id="predictions-container" class="players-list">
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </div>
+                    
+                    <div id="prediction-error" class="error-message"></div>
+                    
+                    <div id="all-predicted" class="success-box hidden">
+                        <p>Todas las predicciones han sido registradas</p>
+                        <p class="small">Total predicciones: <span id="total-predicted">0</span> de <span id="max-possible">1</span> posibles</p>
+                    </div> 
+                    
+                    <button id="play-hand" class="primary-button hidden">Jugar Mano</button>
+                </div>
+                
+                <!-- Resultados -->
+                <div id="results-section" class="card hidden">
+                    <h2>Resultados - <span id="result-cards">1</span> Cartas</h2>
+                    
+                    <p class="description">Marca los jugadores que cumplieron su predicción.</p>
+                    
+                    <div id="results-container" class="players-list">
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </div>
+                    
+                    <div id="result-error" class="error-message"></div>
+                    
+                    <div class="button-group">
+                        <button id="save-results" class="primary-button">Guardar Resultados</button>
+                        <button id="next-hand" class="secondary-button">Siguiente Mano</button>
+                    </div>
+                </div>
+                
+                <!-- Tabla de Puntuaciones -->
+                <div id="score-table-section" class="card">
+                    <h2>Tabla de Puntuaciones</h2>
+                    
+                    <div class="table-container">
+                        <table id="score-table">
+                            <thead>
+                                <tr id="score-table-header">
+                                    <th>Ronda</th>
+                                    <!-- Se llenará dinámicamente con JavaScript -->
+                                </tr>
+                            </thead>
+                            <tbody id="score-table-body">
+                                <!-- Se llenará dinámicamente con JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button id="end-game-btn" class="danger-button">Finalizar Partida</button>
+                </div>
+            </section>
+
+            <!-- Fin del Juego -->
+            <section id="game-end" class="tab-content hidden">
+                <h2>¡Juego Terminado!</h2>
+
+                                <h3>Clasificación Final</h3>
+                <div id="final-ranking" class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Jugador</th>
+                                <th>Puntaje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranking-table-body">
+                            <!-- Se llenará dinámicamente con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="final-scores" class="table-container">
+                    <!-- Se copiará la tabla de puntuaciones aquí -->
+                </div>
+                
+
+                
+                <button id="new-game" class="primary-button">Nuevo Juego</button>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        // Registrar el Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('Service Worker registrado con éxito:', registration))
+                    .catch(err => console.log('Error al registrar el Service Worker:', err));
+            });
+        }
+    </script>
+
+    <!-- Modal de Confirmación Personalizado -->
+    <div id="confirmation-modal" class="modal-overlay hidden">
+        <div class="modal-dialog">
+            <p id="modal-message">¿Estás seguro?</p>
+            <div class="modal-buttons">
+                <button id="modal-cancel" class="secondary-button">Cancelar</button>
+                <button id="modal-confirm" class="danger-button">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
