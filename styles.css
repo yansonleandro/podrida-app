@@ -287,6 +287,11 @@ button {
     border-right: 3px solid var(--primary-color);
 }
 
+/* Reducir padding en la tarjeta de la tabla para dar más espacio */
+#score-table-section.card {
+    padding: 1.5rem 0.5rem;
+}
+
 .table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
@@ -323,8 +328,8 @@ td:first-child {
     position: sticky;
     left: 0;
     z-index: 2;
-    width: 90px; /* Ancho reducido para la primera columna */
-    min-width: 90px;
+    width: auto; /* Ajustar al contenido */
+    min-width: auto;
 }
 
 /* La cabecera de la columna fija necesita un z-index mayor para estar sobre las celdas del body al hacer scroll vertical */
